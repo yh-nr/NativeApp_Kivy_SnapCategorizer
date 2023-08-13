@@ -16,11 +16,11 @@ except:pass
 # カメラへのアクセス許可を要求する
 if platform == "android":
     if check_permission(Permission.CAMERA):pass
-    else:request_permissions(Permission.CAMERA)
+    else:request_permissions([Permission.CAMERA])
     if check_permission(Permission.WRITE_EXTERNAL_STORAGE):pass
-    else:request_permissions(Permission.WRITE_EXTERNAL_STORAGE)
+    else:request_permissions([Permission.WRITE_EXTERNAL_STORAGE])
     if check_permission(Permission.READ_EXTERNAL_STORAGE):pass
-    else:request_permissions(Permission.READ_EXTERNAL_STORAGE)
+    else:request_permissions([Permission.READ_EXTERNAL_STORAGE])
 else:pass
 
 class ATButton(ATButton):pass
