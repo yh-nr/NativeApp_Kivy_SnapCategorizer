@@ -1,0 +1,206 @@
+Screen: 
+    name: 'Cam2annotate'
+    on_enter:camerapreview.play()
+    on_pre_leave:camerapreview.disconnect_camera()
+
+    CameraWidget:
+        CameraPreview:
+            id:camerapreview
+            size: root.size
+
+        BoxLayout:
+            orientation: 'vertical'
+            size: root.size
+
+            GridLayout:
+                rows:4
+                cols:3
+                size: root.size
+
+                ATButton:
+                    custom_id: 'btn0'
+                    text: camerapreview.btn_name[0]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+                ATButton:
+                    custom_id: 'btn1'
+                    text: camerapreview.btn_name[1]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+                ATButton:
+                    custom_id: 'btn2'
+                    text: camerapreview.btn_name[2]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+                ATButton:
+                    custom_id: 'btn3'
+                    text: camerapreview.btn_name[3]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+                ATButton:
+                    custom_id: 'btn4'
+                    text: camerapreview.btn_name[4]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+                ATButton:
+                    custom_id: 'btn5'
+                    text: camerapreview.btn_name[5]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+                ATButton:
+                    custom_id: 'btn6'
+                    text: camerapreview.btn_name[6]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+                ATButton:
+                    custom_id: 'btn7'
+                    text: camerapreview.btn_name[7]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+                ATButton:
+                    custom_id: 'btn8'
+                    text: camerapreview.btn_name[8]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+                ATButton:
+                    custom_id: 'btn9'
+                    text: camerapreview.btn_name[9]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+                ATButton:
+                    custom_id: 'btn10'
+                    text: camerapreview.btn_name[10]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+                ATButton:
+                    custom_id: 'btn11'
+                    text: camerapreview.btn_name[11]
+                    background_color: 1,1,1,0
+                    color: 1,1,1,.8
+                    font_size:35
+                    halign: 'center'
+                    bold:True
+                    center: root.width * 0.3, root.height * 0.3
+                    on_press:camerapreview.capture_button(self)
+                    on_long_press:camerapreview.popup_open(self)
+
+            BoxLayout:
+                size_hint_y: 0.2
+                Button:
+                    text: "I/O"
+                    background_color: 1,1,1,0
+                    color: 1,.3,.3,.5
+                    font_size:35
+                    bold:True
+                    on_press:camerapreview.play()
+                                        
+                Button:
+                    text: "Load Default"
+                    background_color: 1,1,1,0
+                    color: 1,.3,.3,.5
+                    font_size:35
+                    bold:True
+                    on_press:camerapreview.load_button()
+                    
+<CameraWidget@Widget>:
+            
+
+<PopupMenu>
+    orientation: 'vertical'
+    id:popup_menu
+    popup_text: ['btn4','4','コリコリ']
+    title:root.popup_text[0]
+
+    TextInput:
+        id: input2
+        input_filter: 'int'
+        text: root.popup_text[1]
+        multiline:False
+
+    TextInput:
+        id: input3
+        text: root.popup_text[2]
+        multiline:False
+
+    Button:
+        text: 'Submit&Close'
+        on_release: 
+            root.update_setting(root.popup_text[0], input2.text, input3.text)
+            root.popup_close()
