@@ -25,16 +25,12 @@
         orientation: 'vertical'
         size: root.size
 
-        ButtonGrid:
-            camera_preview:camerapreview
-            buttongrid:buttongrid
-            id:buttongrid
+        GridLayout:
             rows:4
             cols:3
             size: root.size
 
             ATButton:
-                index:1
                 custom_id: 'btn0'
                 text: camerapreview.btn_name[0]
                 background_color: 1,1,1,0
@@ -47,7 +43,6 @@
                 on_long_press:camerapreview.popup_open(self)
 
             ATButton:
-                index:1
                 custom_id: 'btn1'
                 text: camerapreview.btn_name[1]
                 background_color: 1,1,1,0
@@ -60,7 +55,6 @@
                 on_long_press:camerapreview.popup_open(self)
 
             ATButton:
-                index:1
                 custom_id: 'btn2'
                 text: camerapreview.btn_name[2]
                 background_color: 1,1,1,0
@@ -73,7 +67,6 @@
                 on_long_press:camerapreview.popup_open(self)
 
             ATButton:
-                index:1
                 custom_id: 'btn3'
                 text: camerapreview.btn_name[3]
                 background_color: 1,1,1,0
@@ -86,7 +79,6 @@
                 on_long_press:camerapreview.popup_open(self)
 
             ATButton:
-                index:1
                 custom_id: 'btn4'
                 text: camerapreview.btn_name[4]
                 background_color: 1,1,1,0
@@ -99,7 +91,6 @@
                 on_long_press:camerapreview.popup_open(self)
 
             ATButton:
-                index:1
                 custom_id: 'btn5'
                 text: camerapreview.btn_name[5]
                 background_color: 1,1,1,0
@@ -112,7 +103,6 @@
                 on_long_press:camerapreview.popup_open(self)
 
             ATButton:
-                index:1
                 custom_id: 'btn6'
                 text: camerapreview.btn_name[6]
                 background_color: 1,1,1,0
@@ -125,7 +115,6 @@
                 on_long_press:camerapreview.popup_open(self)
 
             ATButton:
-                index:1
                 custom_id: 'btn7'
                 text: camerapreview.btn_name[7]
                 background_color: 1,1,1,0
@@ -138,7 +127,6 @@
                 on_long_press:camerapreview.popup_open(self)
 
             ATButton:
-                index:1
                 custom_id: 'btn8'
                 text: camerapreview.btn_name[8]
                 background_color: 1,1,1,0
@@ -151,7 +139,6 @@
                 on_long_press:camerapreview.popup_open(self)
 
             ATButton:
-                index:1
                 custom_id: 'btn9'
                 text: camerapreview.btn_name[9]
                 background_color: 1,1,1,0
@@ -164,7 +151,6 @@
                 on_long_press:camerapreview.popup_open(self)
 
             ATButton:
-                index:1
                 custom_id: 'btn10'
                 text: camerapreview.btn_name[10]
                 background_color: 1,1,1,0
@@ -177,11 +163,16 @@
                 on_long_press:camerapreview.popup_open(self)
 
             ATButton:
-                index:1
                 custom_id: 'btn11'
                 text: camerapreview.btn_name[11]
-                # center: root.width * 0.3, root.height * 0.3
-                
+                background_color: 1,1,1,0
+                color: 1,1,1,.8
+                font_size:35
+                halign: 'center'
+                bold:True
+                center: root.width * 0.3, root.height * 0.3
+                on_press:camerapreview.capture_button(self)
+                on_long_press:camerapreview.popup_open(self)
 
         BoxLayout:
             size_hint_y: 0.2
@@ -192,14 +183,6 @@
                 font_size:35
                 bold:True
                 on_press:camerapreview.play()
-                                    
-            Button:
-                text: "AddButtons"
-                background_color: 1,1,1,0
-                color: 1,.3,.3,.5
-                font_size:35
-                bold:True
-                on_press:buttongrid.add_buttons()
                                     
             Button:
                 text: "Load Default"
