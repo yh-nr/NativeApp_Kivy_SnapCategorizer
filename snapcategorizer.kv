@@ -116,7 +116,7 @@
                 font_size:35
                 bold:True
                 on_press:buttongrid.add_buttons(offset = 24)
-                                    
+                
             # Button:
             #     text: "Default"
             #     background_color: 1,1,1,0
@@ -124,6 +124,13 @@
             #     font_size:35
             #     bold:True
             #     on_press:camerapreview.load_default_settings()
+            Button:
+                text: "Max"
+                background_color: 1,1,1,0
+                color: 1,.3,.3,.5
+                font_size:35
+                bold:True
+                on_press:camerapreview.add_button()
 
 
 <PopupMenu>

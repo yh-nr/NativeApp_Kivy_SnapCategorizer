@@ -109,26 +109,28 @@ class CameraPreview(Preview):
 
     def update_setting(self, btn, num, name):
         config_manager.update_setting(btn, num, name)
-        print('testA')
-        # self.update_button_name()
-        print('testB')
         self.buttongrid.add_buttons()
 
     # デフォルトの設定ファイルを再読み込みする
     def load_default_settings(self):
         setting = config_manager.load_config_from_file(r'./assets/config.json')
         config_manager.save_config_to_file('config.json', setting)
-        # self.update_button_name()
         self.buttongrid.add_buttons()
 
-    
+    def maxnum_from_settings(self):
+        settings = config_manager.settings
+        nums = [int(key.replace("btn", "")) for key in settings if key.startswith("btn")]
+        return max(nums)
 
-    # def update_button_name(self):
-    #         print(self)
-    #         for n in range(len(self.btn_name)):
-    #             print(n)
-    #             self.btn_name[n] = '['+str(config_manager.settings[f'btn{n}']['num'])+']\n'+config_manager.settings[f'btn{n}']['name']
-
+    def add_button(self):
+        settings = config_manager.settings
+        maxnum = max([int(key.replace("btn", "")) for key in settings if key.startswith("btn")])+1
+        settings[f'btn{maxnum}'] = {
+            "num": maxnum,
+            "name": "＊＊＊"  # ここに適切な名前や値を設定してください
+        }
+        config_manager.save_config_to_file('config.json', settings)
+        self.buttongrid.add_buttons()
 
     # ボタンの設定変更ポップアップを表示する
     def popup_open(self, instance):
@@ -189,6 +191,8 @@ class ATButton(Button):
 
     def on_long_press(self):
         pass
+
+    
 
 
 class PopupMenu(BoxLayout):
