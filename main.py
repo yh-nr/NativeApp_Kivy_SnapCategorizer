@@ -154,7 +154,6 @@ class ATButton(Button):
                  text='ボタン', 
                  font_size=35, 
                  background_color= (1,1,1,0),
-                 color= (1,1,1,.8),
                  halign= 'center',
                  **kwargs):
         
@@ -165,14 +164,22 @@ class ATButton(Button):
         self.text = text
         self.font_size = font_size
         self.background_color= background_color
-        self.color= color
         self.halign= halign
+
+        # 文字色変更用
+        self.color_index = 0
+        self.colors = [(0, 0, 0, .7), (1, 0, 0, .7), (1, 1, 1, .7), (1, 1, 1, 0)]  # 黒, 赤, 白
+        self.color = self.colors[self.color_index]
+        Clock.schedule_interval(self.update_color, 1/4)  # 1秒ご
 
         # 長押しを実装
         self.register_event_type('on_long_press')
         self.long_press_time = 0.5  # 長押しとして認識するまでの時間（秒）
         self._long_press_clock = None
     
+    def update_color(self, *args):
+        self.color_index = (self.color_index + 1) % 4
+        self.color = self.colors[self.color_index]
 
     def on_touch_down(self, touch):
         if super(ATButton, self).on_touch_down(touch):
