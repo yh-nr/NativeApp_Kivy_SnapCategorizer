@@ -6,6 +6,7 @@ from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.core.audio import SoundLoader
 from kivy.properties import ObjectProperty, StringProperty, ListProperty
 from kivy.utils import platform
 from kivy.clock import Clock
@@ -18,7 +19,6 @@ except:pass
 
 from src.func import show_toast
 from src import config_manager
-
 
 # カメラへのアクセス許可を要求する
 if platform == "android":
@@ -42,31 +42,32 @@ class ButtonGrid(GridLayout):
         super(ButtonGrid, self).__init__(**kwargs)
         
 
-    def add_buttons(self, ):
+    def add_buttons(self, offset=0):
         self.buttongrid.clear_widgets()
-
-        for i in range(len(self.camera_preview.btn_name)):
-            btn = ATButton(custom_id=f'btn{i}',
-                           index=i,
-                           camera_preview= self.camera_preview
-                           )
-            print(type(btn.text))
-            btn.bind(on_press=lambda btn_instance=btn: self.camera_preview.capture_button(btn_instance))
-            btn.bind(on_long_press=lambda btn_instance=btn: self.camera_preview.popup_open(btn_instance))
-            self.add_widget(btn)
+        try:
+            for i in range(12):
+                n = i + offset
+                btn = ATButton(custom_id=f'btn{n}',
+                            text = '['+str(config_manager.settings[f'btn{n}']['num'])+']\n'+config_manager.settings[f'btn{n}']['name']
+                            )
+                btn.bind(on_press=lambda btn_instance=btn: self.camera_preview.capture_button(btn_instance))
+                btn.bind(on_long_press=lambda btn_instance=btn: self.camera_preview.popup_open(btn_instance))
+                self.add_widget(btn)
+        except:pass
 
 class CameraPreview(Preview):
     # image_texture = ObjectProperty(None)
     # image_capture = ObjectProperty(None)
     # camera = ObjectProperty(None)
     camerapreview = ObjectProperty(None)
-    btn_name = ListProperty(['btn0','btn1','btn2','btn3','btn4','btn5','btn6','btn7','btn8','btn9','btn10','btn11'])
-    
+    buttongrid = ObjectProperty(None)
+    # btn_name = ListProperty(['btn0','btn1','btn2','btn3','btn4','btn5','btn6','btn7','btn8','btn9','btn10','btn11'])
+    sound = SoundLoader.load(r'./res/shuttersound.mp3')
 
     def __init__(self, **kwargs):
         super(CameraPreview, self).__init__(**kwargs)
-        for n in range(len(self.btn_name)):
-            self.btn_name[n] = '['+str(config_manager.settings[f'btn{n}']['num'])+']\n'+config_manager.settings[f'btn{n}']['name']
+        # for n in range(len(self.btn_name)):
+        #     self.btn_name[n] = '['+str(config_manager.settings[f'btn{n}']['num'])+']\n'+config_manager.settings[f'btn{n}']['name']
         self.play()
         pass
 
@@ -89,6 +90,7 @@ class CameraPreview(Preview):
             self.disconnect_camera()
 
     def capture_button(self,instance):
+        if self.sound:self.sound.play()
         t_delta = datetime.timedelta(hours=9)
         JST = datetime.timezone(t_delta, 'JST')
         now = datetime.datetime.now(JST)
@@ -108,24 +110,27 @@ class CameraPreview(Preview):
     def update_setting(self, btn, num, name):
         config_manager.update_setting(btn, num, name)
         print('testA')
-        self.update_button_name()
+        # self.update_button_name()
         print('testB')
+        self.buttongrid.add_buttons()
 
-    def load_button(self):
+    # デフォルトの設定ファイルを再読み込みする
+    def load_default_settings(self):
         setting = config_manager.load_config_from_file(r'./assets/config.json')
         config_manager.save_config_to_file('config.json', setting)
-        self.update_button_name()
+        # self.update_button_name()
+        self.buttongrid.add_buttons()
+
     
-    def update_button_name(self):
-            print(self)
-            for n in range(len(self.btn_name)):
-                print(n)
-                self.btn_name[n] = '['+str(config_manager.settings[f'btn{n}']['num'])+']\n'+config_manager.settings[f'btn{n}']['name']
 
-    def change_button_text(self, value):
-        print('test')
-        pass
+    # def update_button_name(self):
+    #         print(self)
+    #         for n in range(len(self.btn_name)):
+    #             print(n)
+    #             self.btn_name[n] = '['+str(config_manager.settings[f'btn{n}']['num'])+']\n'+config_manager.settings[f'btn{n}']['name']
 
+
+    # ボタンの設定変更ポップアップを表示する
     def popup_open(self, instance):
         settings = config_manager.settings
         btn = instance.custom_id
@@ -142,15 +147,9 @@ class CameraPreview(Preview):
 
 
 class ATButton(Button):
-    camerapreview = CameraPreview()
-    print(type(camerapreview))
-    camera_preview = ObjectProperty(camerapreview.camerapreview)
-    
-    print(type(camerapreview.camerapreview))
-
-
     def __init__(self,
-                 index=0, 
+                 custom_id='btn0', 
+                 text='ボタン', 
                  font_size=35, 
                  background_color= (1,1,1,0),
                  color= (1,1,1,.8),
@@ -160,23 +159,18 @@ class ATButton(Button):
         super(ATButton, self).__init__(**kwargs)
 
         # デフォルト値を読み込み
+        self.custom_id = custom_id
+        self.text = text
         self.font_size = font_size
         self.background_color= background_color
         self.color= color
         self.halign= halign
-
-        # 
-        self.index = index
-        self.camera_preview.bind(btn_name=self.update_text)
-        self.update_text()
 
         # 長押しを実装
         self.register_event_type('on_long_press')
         self.long_press_time = 0.5  # 長押しとして認識するまでの時間（秒）
         self._long_press_clock = None
     
-    def update_text(self, *args):
-        self.text = self.camerapreview.btn_name[self.index]
 
     def on_touch_down(self, touch):
         if super(ATButton, self).on_touch_down(touch):
