@@ -199,8 +199,6 @@ class ATButton(Button):
     def on_long_press(self):
         pass
 
-    
-
 
 class PopupMenu(BoxLayout):
     popup_text = ListProperty()
