@@ -1,24 +1,20 @@
-import datetime
-
 #kivy関連import
-from kivy.app import App   
-from kivy.uix.button import Button
-from kivy.uix.popup import Popup
+from kivy.app import App            
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.audio import SoundLoader
 from kivy.properties import ObjectProperty, StringProperty, ListProperty
 from kivy.utils import platform
-from kivy.clock import Clock
 from kivy.config import Config
 Config.set('kivy', 'log_level', 'debug')
+
 import japanize_kivy
-from camera4kivy import Preview
+
+from src.Cam2annotate import CameraPreview, ATButton, PopupMenu
+from src.func import show_toast
+
 try:from android.permissions import request_permissions, Permission, check_permission
 except:pass
-
-from src.func import show_toast
-from src import config_manager
 
 # カメラへのアクセス許可を要求する
 if platform == "android":
@@ -30,6 +26,9 @@ if platform == "android":
     else:request_permissions([Permission.READ_EXTERNAL_STORAGE])
 else:pass
 
+class ATButton(ATButton):pass
+class CameraPreview(CameraPreview):pass
+class PopupMenu(PopupMenu):pass
 
 class AppFrame(BoxLayout):pass
 
@@ -145,8 +144,7 @@ class CameraPreview(Preview):
 
     def popup_close(self):
         self.popup.dismiss()
-
-
+        
 
 class ATButton(Button):
     def __init__(self,
@@ -205,9 +203,6 @@ class PopupMenu(BoxLayout):
     update_setting = ObjectProperty(None)
     popup_close = ObjectProperty(None)
 
-
-
-
 class SnapCategorizerApp(App):
     def __init__(self, **kwargs):
         super(SnapCategorizerApp, self).__init__(**kwargs)
@@ -219,3 +214,7 @@ class SnapCategorizerApp(App):
 
 if __name__ == '__main__':                      #main.pyが直接実行されたら、、、という意味らしい
     SnapCategorizerApp().run()                         #
+    
+
+
+
