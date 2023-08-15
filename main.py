@@ -1,4 +1,5 @@
 import datetime
+import timeit
 
 #kivy関連import
 from kivy.app import App   
@@ -20,6 +21,9 @@ except:pass
 from src.func import show_toast
 from src import config_manager
 
+DOUBLE_TAP_TIME = 0.2   # Change time in seconds
+LONG_PRESSED_TIME = 0.3  # Change time in seconds
+
 # カメラへのアクセス許可を要求する
 if platform == "android":
     if check_permission(Permission.CAMERA):pass
@@ -40,20 +44,36 @@ class ButtonGrid(GridLayout):
 
     def __init__(self, **kwargs):
         super(ButtonGrid, self).__init__(**kwargs)
-        
+    
+    
+    def on_parent(self, instance, value):
+        self.refreshAndSwitchButtonSet()
 
-    def add_buttons(self, offset=0):
-        self.buttongrid.clear_widgets()
+    
+    def refreshAndSwitchButtonSet(self, mode=None):
+        offset=0
+        current_buttons = [int(bc.custom_id.replace('btn','')) for bc in self.children]
+        if len(current_buttons):offset += max(current_buttons)+1
+        try:config_manager.settings[f'btn{max(current_buttons)+1}']
+        except:offset=0
+        if not mode:
+            try:offset = min(current_buttons)
+            except:offset=0
+        self.clear_widgets()
         try:
             for i in range(12):
                 n = i + offset
                 btn = ATButton(custom_id=f'btn{n}',
                             text = '['+str(config_manager.settings[f'btn{n}']['num'])+']\n'+config_manager.settings[f'btn{n}']['name']
                             )
-                btn.bind(on_press=lambda btn_instance=btn: self.camera_preview.capture_button(btn_instance))
+                btn.bind(on_single_press=lambda btn_instance=btn: self.camera_preview.capture_button(btn_instance))
                 btn.bind(on_long_press=lambda btn_instance=btn: self.camera_preview.popup_open(btn_instance))
                 self.add_widget(btn)
         except:pass
+
+    def test_children(self):
+        current_buttons = [int(bc.custom_id.replace('btn','')) for bc in self.children]
+        print(current_buttons)
 
 class CameraPreview(Preview):
     # image_texture = ObjectProperty(None)
@@ -61,33 +81,37 @@ class CameraPreview(Preview):
     # camera = ObjectProperty(None)
     camerapreview = ObjectProperty(None)
     buttongrid = ObjectProperty(None)
-    # btn_name = ListProperty(['btn0','btn1','btn2','btn3','btn4','btn5','btn6','btn7','btn8','btn9','btn10','btn11'])
     sound = SoundLoader.load(r'./res/shuttersound.mp3')
 
     def __init__(self, **kwargs):
         super(CameraPreview, self).__init__(**kwargs)
-        # for n in range(len(self.btn_name)):
-        #     self.btn_name[n] = '['+str(config_manager.settings[f'btn{n}']['num'])+']\n'+config_manager.settings[f'btn{n}']['name']
         self.play()
         pass
 
     def get_button_text(self, instance):
         settings = config_manager.settings
         return f"[{settings[instance.custom_id]['num']}]\n{settings[instance.custom_id]['name']}"
- 
+    
     def play(self):
-        if self.camera_connected == False:
-            if platform == "android":
-                if check_permission(Permission.CAMERA):
-                    self.connect_camera(enable_analyze_pixels = True, enable_video = False)
-                else:
-                    Clock.schedule_once(lambda dt: self.play(), 5)
-            else:
-                # show_toast('カメラへの接続を試みます')
-                self.connect_camera(enable_analyze_pixels = True, enable_video = False)
-        else:
-            # show_toast('カメラを切断します')
+        if self.camera_connected:
             self.disconnect_camera()
+            # show_toast('カメラを切断します')
+        else:
+            self.try_connect_camera()
+
+    def try_connect_camera(self):
+        if platform == "android":
+            self.connect_camera_if_permitted()
+        else:
+            self.connect_camera(enable_analyze_pixels=True, enable_video=False)
+            # show_toast('カメラへの接続を試みます')
+
+    def connect_camera_if_permitted(self):
+        if check_permission(Permission.CAMERA):
+            self.connect_camera(enable_analyze_pixels=True, enable_video=False)
+        else:
+            Clock.schedule_once(lambda dt: self.play(), 5)
+
 
     def capture_button(self,instance):
         if self.sound:self.sound.play()
@@ -100,7 +124,6 @@ class CameraPreview(Preview):
         settings = config_manager.settings
         subdir1 = settings['theme']
         subdir2 = str(settings[instance.custom_id]['num'])
-
         subdir = subdir1 + '/' + subdir2
         name = f'img{now:%y%m%d%H%M%S%f}'[:-3]
         self.capture_photo(subdir=subdir ,name=name)
@@ -109,13 +132,13 @@ class CameraPreview(Preview):
 
     def update_setting(self, btn, num, name):
         config_manager.update_setting(btn, num, name)
-        self.buttongrid.add_buttons()
+        self.buttongrid.refreshAndSwitchButtonSet()
 
     # デフォルトの設定ファイルを再読み込みする
     def load_default_settings(self):
         setting = config_manager.load_config_from_file(r'./assets/config.json')
         config_manager.save_config_to_file('config.json', setting)
-        self.buttongrid.add_buttons()
+        self.buttongrid.refreshAndSwitchButtonSet()
 
     def maxnum_from_settings(self):
         settings = config_manager.settings
@@ -130,7 +153,7 @@ class CameraPreview(Preview):
             "name": "＊＊＊"  # ここに適切な名前や値を設定してください
         }
         config_manager.save_config_to_file('config.json', settings)
-        self.buttongrid.add_buttons()
+        self.buttongrid.refreshAndSwitchButtonSet()
 
     # ボタンの設定変更ポップアップを表示する
     def popup_open(self, instance):
@@ -146,6 +169,9 @@ class CameraPreview(Preview):
     def popup_close(self):
         self.popup.dismiss()
 
+ 
+
+    
 
 
 class ATButton(Button):
@@ -173,32 +199,121 @@ class ATButton(Button):
         Clock.schedule_interval(self.update_color, 1/4)  # 1秒ご
 
         # 長押しを実装
+        self.start = 0
+        self.single_hit = 0
+        self.press_state = False
+        self.register_event_type('on_single_press')
+        self.register_event_type('on_double_press')
         self.register_event_type('on_long_press')
-        self.long_press_time = 0.5  # 長押しとして認識するまでの時間（秒）
-        self._long_press_clock = None
+
     
     def update_color(self, *args):
         self.color_index = (self.color_index + 1) % 4
         self.color = self.colors[self.color_index]
 
+    # def on_touch_down(self, touch):
+    #     print('タッチダウン！')
+    #     if super(ATButton, self).on_touch_down(touch):
+    #         if self._current_touch_id is None or self._current_touch_id != touch.uid:
+    #             # 新たなタッチが発生した場合のみ、フラグをリセットし、タイマーを設定
+    #             self._is_long_press = False
+    #             self._long_press_clock = Clock.schedule_once(self._do_long_press, self.long_press_time)
+    #             self._current_touch_id = touch.uid  # タッチのIDを保存
+    #         return True
+    #     return False
+
+    #     # print('タッチダウン！')
+    #     # self._is_long_press = False  # タッチが始まるたびにフラグをリセット
+    #     # if super(ATButton, self).on_touch_down(touch):
+    #     #     self._long_press_clock = Clock.schedule_once(self._do_long_press, self.long_press_time)
+    #     #     return True
+    #     # return False
+
+    # def on_touch_up(self, touch):
+    #     print('タッチアップ！')
+    #     if self._long_press_clock:
+    #         Clock.unschedule(self._long_press_clock)
+    #         self._long_press_clock = None
+
+    #     if touch.grab_current is self and not self._is_long_press:
+    #         # 長押しでなければ、on_release イベントを発火
+    #         self.dispatch('on_release')
+
+    #     # タッチが終了したので、タッチのIDをリセット
+    #     if self._current_touch_id == touch.uid:
+    #         self._current_touch_id = None
+
+    # #     return super(ATButton, self).on_touch_up(touch)
+
+    # def _on_state(self, instance, value):
+    #     print(value)
+    #     if value == 'down':
+    #         # ボタンが押されたとき、長押しフラグをリセットし、タイマーを設定
+    #         self._is_long_press = False
+    #         self._long_press_clock = Clock.schedule_once(self._do_long_press, self._long_press_time)
+    #     else:
+    #         # ボタンが離されたとき、タイマーをキャンセル
+    #         if self._long_press_clock:
+    #             Clock.unschedule(self._long_press_clock)
+    #             self._long_press_clock = None
+
+    #         if not self._is_long_press:
+    #             # 長押しでなければ、on_release イベントを発火
+    #             self.dispatch('on_release')
+
+    #         # タッチが終了したので、長押しフラグをリセット
+    #         self._is_long_press = False
+
+    # def _do_long_press(self, dt):
+    #     self._is_long_press = True  # 長押しを検出
+    #     self.dispatch('on_long_press')
+
+    # def on_long_press(self):
+    #     print("Long press detected")
+
+    # def on_release(self):
+    #     print("Button released")
+
     def on_touch_down(self, touch):
-        if super(ATButton, self).on_touch_down(touch):
-            self._long_press_clock = Clock.schedule_once(self._do_long_press, self.long_press_time)
-            return True
-        return False
+        if self.collide_point(touch.x, touch.y):
+            self.start = timeit.default_timer()
+            if touch.is_double_tap:
+                self.press_state = True
+                self.single_hit.cancel()
+                self.dispatch('on_double_press')
+        else:
+            return super(ATButton, self).on_touch_down(touch)
 
     def on_touch_up(self, touch):
-        if self._long_press_clock:
-            Clock.unschedule(self._long_press_clock)
-            self._long_press_clock = None
-        return super(ATButton, self).on_touch_up(touch)
-    
-    def _do_long_press(self, dt):
-        self.dispatch('on_long_press')
+        if self.press_state is False:
+            if self.collide_point(touch.x, touch.y):
+                stop = timeit.default_timer()
+                awaited = stop - self.start
 
-    def on_long_press(self):
+                def not_double(time):
+                    nonlocal awaited
+                    if awaited > LONG_PRESSED_TIME:
+                        self.dispatch('on_long_press')
+                    else:
+                        self.dispatch('on_single_press')
+
+                self.single_hit = Clock.schedule_once(not_double, DOUBLE_TAP_TIME)
+            else:
+                return super(ATButton, self).on_touch_down(touch)
+        else:
+            self.press_state = False
+
+    def on_single_press(self):
+        print('single')
         pass
 
+    def on_double_press(self):
+        print('double')
+        pass
+
+    def on_long_press(self):
+        print('long')
+        pass
 
 class PopupMenu(BoxLayout):
     popup_text = ListProperty()
@@ -216,6 +331,7 @@ class SnapCategorizerApp(App):
     def build(self):
         show_toast(self.title)
         return AppFrame()
+    
 
 if __name__ == '__main__':                      #main.pyが直接実行されたら、、、という意味らしい
     SnapCategorizerApp().run()                         #
