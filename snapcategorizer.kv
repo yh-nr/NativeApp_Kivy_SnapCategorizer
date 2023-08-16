@@ -175,4 +175,6 @@
                 on_release: root.popup_close()
             Button:
                 text: "Load"
-                on_release: root.load(filechooser.path, filechooser.selection)
+                on_release: 
+                    root.load(filechooser.path, filechooser.selection)
+                    root.popup_close()

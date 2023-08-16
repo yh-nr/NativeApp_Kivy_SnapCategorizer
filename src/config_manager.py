@@ -7,6 +7,7 @@ def load_config_from_file(filename=SETTINGS_FILE):
     global settings
     with open(filename, 'r', encoding='utf-8') as f:
         settings = json.load(f)
+        save_config_to_file(SETTINGS_FILE, settings)
     return settings
 
 

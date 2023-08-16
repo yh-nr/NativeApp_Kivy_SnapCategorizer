@@ -201,10 +201,7 @@ class CameraPreview(Preview):
         self.buttongrid.refreshAndSwitchButtonSet()
     
     def load_external_json(self,path,selected):
-        # config_manager.delete_setting(num)
-        print('test')
-        print(path)
-        print(selected)
+        if selected:config_manager.load_config_from_file(selected[0])
         self.buttongrid.refreshAndSwitchButtonSet()
 
     def add_newbutton(self, btn, num, name):
