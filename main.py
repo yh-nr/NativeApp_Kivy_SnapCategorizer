@@ -19,7 +19,9 @@ from kivy.config import Config
 Config.set('kivy', 'log_level', 'debug')
 import japanize_kivy
 from camera4kivy import Preview
-try:from android.permissions import request_permissions, Permission, check_permission
+try:
+    from android.permissions import request_permissions, Permission, check_permission
+    from src.filepicker import open_file
 except:pass
 
 from src.func import show_toast
@@ -30,12 +32,15 @@ LONG_PRESSED_TIME = 0.3  # Change time in seconds
 
 # カメラへのアクセス許可を要求する
 if platform == "android":
-    if check_permission(Permission.CAMERA):pass
-    else:request_permissions([Permission.CAMERA])
-    if check_permission(Permission.WRITE_EXTERNAL_STORAGE):pass
-    else:request_permissions([Permission.WRITE_EXTERNAL_STORAGE])
-    if check_permission(Permission.READ_EXTERNAL_STORAGE):pass
-    else:request_permissions([Permission.READ_EXTERNAL_STORAGE])
+    granted = True
+    permissions = [Permission.CAMERA, Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE]
+    for p in permissions:
+        granted = granted and check_permission(p)
+    if not granted:
+        request_permissions([Permission.CAMERA],
+                            [Permission.WRITE_EXTERNAL_STORAGE],
+                            [Permission.READ_EXTERNAL_STORAGE]
+                            )
 else:pass
 
 
@@ -212,6 +217,11 @@ class CameraPreview(Preview):
         }
         config_manager.save_config_to_file('config.json', settings)
         self.buttongrid.refreshAndSwitchButtonSet()
+
+    
+    def test(self):
+        print('チェックチェック')
+        open_file("content://downloads/public_downloads")
 
 class ATButton(Button):
     def __init__(self,

@@ -10,7 +10,6 @@ def load_config_from_file(filename=SETTINGS_FILE):
         save_config_to_file(SETTINGS_FILE, settings)
     return settings
 
-
 def save_config_to_file(filename, data):
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
