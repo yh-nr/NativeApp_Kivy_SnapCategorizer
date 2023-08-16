@@ -11,7 +11,10 @@ try:
     Uri = autoclass('android.net.Uri')
     Intent = autoclass('android.content.Intent')
     PythonActivity = autoclass('org.kivy.android.PythonActivity')
-except:pass
+except:
+    print('autoclassでエラーでたよ！！！！！！')
+    print('autoclassでエラーでたよ！！！！！！')
+    print('autoclassでエラーでたよ！！！！！！')
 
 class ActivityResultEvent(PythonJavaClass):
     __javainterfaces__ = ['org/kivy/android/ActivityResultListener']
