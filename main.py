@@ -6,12 +6,13 @@ from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.filechooser import FileChooserListView
 from kivy.core.audio import SoundLoader
 from kivy.core.text import Label as CoreLabel
 from kivy.graphics import Rectangle
 
 from kivy.graphics import Color, Line
-from kivy.properties import ObjectProperty, StringProperty, ListProperty
+from kivy.properties import ObjectProperty, StringProperty, ListProperty, NumericProperty
 from kivy.utils import platform
 from kivy.clock import Clock
 from kivy.config import Config
@@ -54,29 +55,41 @@ class ButtonGrid(GridLayout):
 
     
     def refreshAndSwitchButtonSet(self, mode=None):
+        '''シャッターボタンを更新する。もしくは次のページ（次の12個のボタン）を表示する関数
+        '''
+        settings = config_manager.settings
+        limit = max([int(key.replace("btn", "")) for key in settings if key.startswith("btn")])
         offset=0
         current_buttons = [int(bc.custom_id.replace('btn','')) for bc in self.children]
         if len(current_buttons):offset += max(current_buttons)+1
-        try:config_manager.settings[f'btn{max(current_buttons)+1}']
-        except:offset=0
+        # try:settings[f'btn{max(current_buttons)+1}']
+        # except:offset=0
         if not mode:
             try:offset = min(current_buttons)
             except:offset=0
         self.clear_widgets()
-        try:
-            for i in range(12):
-                n = i + offset
+
+        i = 0
+        while i < 12:
+            n = i + offset
+            if n > limit:break
+            try:
                 btn = ATButton(custom_id=f'btn{n}',
-                            text = '['+str(config_manager.settings[f'btn{n}']['num'])+']\n'+config_manager.settings[f'btn{n}']['name']
+                            text='[' + str(config_manager.settings[f'btn{n}']['num']) + ']\n' + config_manager.settings[f'btn{n}']['name']
                             )
                 btn.bind(on_single_press=lambda btn_instance=btn: self.camera_preview.capture_button(btn_instance))
-                btn.bind(on_long_press=lambda btn_instance=btn: self.camera_preview.popup_open(btn_instance))
+                btn.bind(on_long_press=lambda btn_instance=btn: self.camera_preview.button_change_popup_open(btn_instance))
+                btn.bind(on_double_press=lambda btn_instance=btn: self.camera_preview.confirmdelete_popup_open(btn_instance))
                 self.add_widget(btn)
-        except:pass
+                i += 1  # エラーが発生しなかった場合にのみカウンタをインクリメントします
+            except:
+                offset += 1
+                
 
-    def test_children(self):
-        current_buttons = [int(bc.custom_id.replace('btn','')) for bc in self.children]
-        print(current_buttons)
+    # # ウィジェットツリーを取得する
+    # def test_children(self):
+    #     current_buttons = [int(bc.custom_id.replace('btn','')) for bc in self.children]
+    #     print(current_buttons)
 
 class CameraPreview(Preview):
     camerapreview = ObjectProperty(None)
@@ -140,42 +153,74 @@ class CameraPreview(Preview):
         pass
 
 
-
-    # ATButtonクラスへ引越し
-    def add_button(self):
-        settings = config_manager.settings
-        maxnum = max([int(key.replace("btn", "")) for key in settings if key.startswith("btn")])+1
-        settings[f'btn{maxnum}'] = {
-            "num": maxnum,
-            "name": "＊＊＊"  # ここに適切な名前や値を設定してください
-        }
-        config_manager.save_config_to_file('config.json', settings)
-        self.buttongrid.refreshAndSwitchButtonSet()
-
     # ボタンの設定変更ポップアップを表示する
-    def popup_open(self, instance):
+    def button_change_popup_open(self, instance):
         settings = config_manager.settings
         btn = instance.custom_id
         num = str(settings[btn]['num'])
         name = settings[instance.custom_id]['name']
         popup_text = [btn, num, name]
-        content = PopupMenu(popup_text=popup_text, popup_close=self.popup_close, update_setting=self.update_setting)
-        self.popup = Popup(title=f'ボタン{btn.replace("btn","")}の割当を変更', content=content, size_hint=(0.5, 0.5), auto_dismiss=True)
+        content = ButtonAddFixMenu(popup_text=popup_text, popup_close=self.popup_close, update_setting=self.update_setting)
+        self.popup = Popup(title=f'ボタン{num}の割当を変更', content=content, size_hint=(0.5, 0.5), auto_dismiss=True)
+        self.popup.open()
+
+    def add_newbutton_popup_open(self):
+        settings = config_manager.settings
+        new_button = max([int(key.replace("btn", "")) for key in settings if key.startswith("btn")])+1
+        settings = config_manager.settings
+        btn = f'btn{new_button}'
+        num = new_button
+        name = '新規ラベル'
+        popup_text = [btn, num, name]
+        content = ButtonAddFixMenu(popup_text=popup_text, popup_close=self.popup_close, update_setting=self.add_newbutton)
+        self.popup = Popup(title=f'ボタン{new_button}を追加', content=content, size_hint=(0.5, 0.5), auto_dismiss=True)
+        self.popup.open()
+
+    def confirmdelete_popup_open(self, instance):
+        settings = config_manager.settings
+        num = str(settings[instance.custom_id]['num'])
+        content = ConfirmDeleteMenu(btn_num=num, popup_close=self.popup_close, delete_setting=self.delete_setting)
+        self.popup = Popup(title=f'確認：ボタン{num}', content=content, size_hint=(0.5, 0.5), auto_dismiss=True)
+        self.popup.open()
+
+    def load_json_popup_open(self):
+        content = LoadJsonMenu(popup_close=self.popup_close, load=self.load_external_json)
+        self.popup = Popup(title=f'JSONファイル読込', content=content, size_hint=(0.5, 0.5), auto_dismiss=True)
         self.popup.open()
 
     def popup_close(self):
         self.popup.dismiss()
-
     
     def update_setting(self, btn, num, name):
         config_manager.update_setting(btn, num, name)
+        self.buttongrid.refreshAndSwitchButtonSet()
+    
+    def delete_setting(self, num):
+        config_manager.delete_setting(num)
+        print('動いてる？')
+        self.buttongrid.refreshAndSwitchButtonSet()
+    
+    def load_external_json(self,path,selected):
+        # config_manager.delete_setting(num)
+        print('test')
+        print(path)
+        print(selected)
+        self.buttongrid.refreshAndSwitchButtonSet()
+
+    def add_newbutton(self, btn, num, name):
+        settings = config_manager.settings
+        settings[btn] = {
+            "num": num,
+            "name": name  # ここに適切な名前や値を設定してください
+        }
+        config_manager.save_config_to_file('config.json', settings)
         self.buttongrid.refreshAndSwitchButtonSet()
 
 class ATButton(Button):
     def __init__(self,
                  custom_id='btn0', 
                  text='ボタン', 
-                 font_size= '35sp', 
+                 font_size= '35', 
                  color= (1,1,1,1), 
                  outline_color= (1,0,0,.5), 
                  outline_weight= .8,
@@ -207,7 +252,7 @@ class ATButton(Button):
         self.register_event_type('on_single_press')
         self.register_event_type('on_double_press')
         self.register_event_type('on_long_press')
-        # self.bind(on_long_press=lambda self:self.popup_open(self))
+        # self.bind(on_long_press=lambda self:self.button_change_popup_open(self))
 
     def update_text(self, *args):
         # 以前のアウトラインの描画をクリアする
@@ -287,13 +332,20 @@ class ATButton(Button):
         pass
 
 
-class PopupMenu(BoxLayout):
+class ButtonAddFixMenu(BoxLayout):
     popup_text = ListProperty()
     update_setting = ObjectProperty(None)
     popup_close = ObjectProperty(None)
 
+class ConfirmDeleteMenu(BoxLayout):
+    btn_num = StringProperty()
+    delete_setting = ObjectProperty(None)
+    popup_close = ObjectProperty(None)
 
-
+class LoadJsonMenu(BoxLayout):
+    # btn_num = StringProperty()
+    load = ObjectProperty(None)
+    popup_close = ObjectProperty(None)
 
 class SnapCategorizerApp(App):
     def __init__(self, **kwargs):

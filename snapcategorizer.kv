@@ -25,7 +25,7 @@
     BoxLayout:
         orientation: 'vertical'
         size: root.size
-
+        
         ButtonGrid:
             camera_preview:camerapreview
             buttongrid:buttongrid
@@ -39,7 +39,7 @@
             size_hint_y: 0.2
             id:menubuttons
             Button:
-                text: "I/O"
+                text: "CAMERA\nON/OFF"
                 background_color: 1,1,1,0
                 color: 1,.3,.3,.5
                 font_size:35
@@ -53,6 +53,38 @@
                 font_size:35
                 bold:True
                 on_press:buttongrid.refreshAndSwitchButtonSet(mode='next')
+                                    
+            Button:
+                text: "+NEW\nBUTTON"
+                background_color: 1,1,1,0
+                color: 1,.3,.3,.5
+                font_size:35
+                bold:True
+                on_press:camerapreview.add_newbutton_popup_open()
+                                    
+            Button:
+                text: "LORD\nJSON"
+                background_color: 1,1,1,0
+                color: 1,.3,.3,.5
+                font_size:35
+                bold:True
+                on_press:camerapreview.load_json_popup_open()
+                                    
+            # Button:
+            #     text: "EXPORT\nJSON"
+            #     background_color: 1,1,1,0
+            #     color: 1,.3,.3,.5
+            #     font_size:35
+            #     bold:True
+            #     on_press:camerapreview.add_newbutton_popup_open()
+                                    
+            # Button:
+            #     text: "ABOUT"
+            #     background_color: 1,1,1,0
+            #     color: 1,.3,.3,.5
+            #     font_size:35
+            #     bold:True
+            #     on_press:camerapreview.add_newbutton_popup_open()
                 
             # Button:
             #     text: "Default"
@@ -71,18 +103,18 @@
             #     on_press:buttongrid.test_children()
 
 
-<PopupMenu>
+<ButtonAddFixMenu>
     orientation: 'vertical'
-    id:popup_menu
+    # id:buttonaddfix_menu
     popup_text: ['btn4','4','コリコリ']
     title:root.popup_text[0]
 
-    TextInput:
-        id: input2
-        input_filter: 'int'
-        input_type: 'number'
-        text: root.popup_text[1]
-        multiline:False
+    # TextInput:
+    #     id: input2
+    #     input_filter: 'int'
+    #     input_type: 'number'
+    #     text: root.popup_text[1]
+    #     multiline:False
 
     TextInput:
         id: input3
@@ -93,6 +125,54 @@
     Button:
         text: 'Save&Close'
         on_release: 
-            root.update_setting(root.popup_text[0], input2.text, input3.text)
+            root.update_setting(root.popup_text[0], root.popup_text[1], input3.text)
             root.popup_close()
 
+
+
+
+<ConfirmDeleteMenu>
+    orientation: 'vertical'
+    # id:confirmdelete_menu
+    btn_num: 1
+    title: '確認'
+
+    Label:
+        text: '削除しますか？'
+    BoxLayout:
+        Button:
+            id: input3
+            input_type: 'text'
+            text: 'DELETE'
+            on_release: 
+                root.delete_setting(root.btn_num)
+                root.popup_close()
+
+        Button:
+            text: 'CANCEL'
+            on_release:root.popup_close()
+
+
+
+<LoadJsonMenu>
+    orientation: 'vertical'
+    # id:confirmdelete_menu
+    btn_num: 1
+    title: 'JSONファイルを選択'
+
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            filters: ['*.json']
+            id: filechooser
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.popup_close()
+            Button:
+                text: "Load"
+                on_release: root.load(filechooser.path, filechooser.selection)
