@@ -1,5 +1,4 @@
-import datetime
-import timeit
+import datetime, timeit, os
 
 #kivy関連import
 from kivy.app import App   
@@ -40,7 +39,7 @@ else:pass
 
 
 class AppFrame(BoxLayout):pass
-
+class MenuButtons(BoxLayout):pass
 
 class ButtonGrid(GridLayout):
     camera_preview = ObjectProperty(None)
@@ -120,32 +119,29 @@ class CameraPreview(Preview):
         JST = datetime.timezone(t_delta, 'JST')
         now = datetime.datetime.now(JST)
 
-        #windowsの場合に、subdir1が存在するかチェックするコードをここに入れる      
-         
         settings = config_manager.settings
-        subdir1 = settings['theme']
-        subdir2 = str(settings[instance.custom_id]['num'])
-        subdir = subdir1 + '/' + subdir2
+        subdir1 = settings['root_dir']
+        subdir2_num = str(settings[instance.custom_id]["num"])
+        subdir2_name = '_' +settings[instance.custom_id]["name"]
+        subdir2 = subdir2_num + subdir2_name
         name = f'img{now:%y%m%d%H%M%S%f}'[:-3]
-        self.capture_photo(subdir=subdir ,name=name)
+        
+        # Windowsで実行する場合に、subdir1が存在しないとcaputure_photoがエラーになるため、ここで作成する。
+        if platform == "win":
+            subdir = os.path.join(subdir1, subdir2_num)
+            if not os.path.exists(subdir):
+                os.makedirs(subdir)
+                self.capture_photo(subdir=subdir ,name=name)
+        else:
+            subdir = os.path.join(subdir1, subdir2)
+            self.capture_photo(subdir=subdir ,name=name)
+        print(subdir)
+        
         pass
 
 
-    def update_setting(self, btn, num, name):
-        config_manager.update_setting(btn, num, name)
-        self.buttongrid.refreshAndSwitchButtonSet()
 
-    # デフォルトの設定ファイルを再読み込みする
-    def load_default_settings(self):
-        setting = config_manager.load_config_from_file(r'./assets/config.json')
-        config_manager.save_config_to_file('config.json', setting)
-        self.buttongrid.refreshAndSwitchButtonSet()
-
-    def maxnum_from_settings(self):
-        settings = config_manager.settings
-        nums = [int(key.replace("btn", "")) for key in settings if key.startswith("btn")]
-        return max(nums)
-
+    # ATButtonクラスへ引越し
     def add_button(self):
         settings = config_manager.settings
         maxnum = max([int(key.replace("btn", "")) for key in settings if key.startswith("btn")])+1
@@ -169,6 +165,11 @@ class CameraPreview(Preview):
 
     def popup_close(self):
         self.popup.dismiss()
+
+    
+    def update_setting(self, btn, num, name):
+        config_manager.update_setting(btn, num, name)
+        self.buttongrid.refreshAndSwitchButtonSet()
 
 class ATButton(Button):
     def __init__(self,
@@ -206,6 +207,7 @@ class ATButton(Button):
         self.register_event_type('on_single_press')
         self.register_event_type('on_double_press')
         self.register_event_type('on_long_press')
+        # self.bind(on_long_press=lambda self:self.popup_open(self))
 
     def update_text(self, *args):
         # 以前のアウトラインの描画をクリアする
@@ -283,6 +285,7 @@ class ATButton(Button):
     def on_long_press(self):
         print('long')
         pass
+
 
 class PopupMenu(BoxLayout):
     popup_text = ListProperty()

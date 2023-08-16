@@ -1,5 +1,5 @@
 {
-    "theme": "Yakiniku",
+    "root_dir": "Yakiniku",
     "btn0": {
         "num": 0,
         "name": "カルビ"
@@ -30,7 +30,7 @@
     },
     "btn7": {
         "num": "7",
-        "name": "たんたん"
+        "name": "よろしく"
     },
     "btn8": {
         "num": 8,
@@ -42,7 +42,7 @@
     },
     "btn10": {
         "num": "10",
-        "name": "ナイスです！yorosikune"
+        "name": "焼とんタン塩234"
     },
     "btn11": {
         "num": 11,

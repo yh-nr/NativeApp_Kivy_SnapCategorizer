@@ -1,5 +1,5 @@
 {
-    "theme": "Yakiniku",
+    "root_dir": "Yakiniku",
     "btn0": {
         "num": 0,
         "name": "カルビ"
