@@ -98,8 +98,6 @@ def load_json_4android():
     picker_initial_uri = Uri.parse("file:///sdcard/")
     open_file(picker_initial_uri)  # ファイルピッカーを開く関数を呼び出します。
 
-    # KivyのPythonActivityにActivityResultListenerを追加します。
-    PythonActivity.addActivityResultListener(process_json_data())
     pass
 
 
@@ -107,3 +105,7 @@ def process_json_data(data):
     # JSONデータを処理する関数
     config_manager.save_config_to_file(config_manager.SETTINGS_FILE, data)
     print(data)  # ここではJSONデータを単に出力していますが、実際にはこのデータを使用して何らかの処理を行います。
+
+    
+# KivyのPythonActivityにActivityResultListenerを追加します。
+PythonActivity.addActivityResultListener(process_json_data())
