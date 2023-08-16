@@ -2,6 +2,7 @@
 
 <AppFrame>:
     orientation: 'vertical'
+    buttongrid:buttongrid
     Label:
         id: title_label
         text:app.title
@@ -14,101 +15,101 @@
                 pos: self.pos
                 size: self.size
 
-    CameraWidget:
-                    
-<CameraWidget@Widget>:
-    CameraPreview:
-        buttongrid:buttongrid
-        id:camerapreview
-        size: root.size
-
-    BoxLayout:
-        orientation: 'vertical'
-        size: root.size
-        
-        ButtonGrid:
-            camera_preview:camerapreview
+    Widget:
+        CameraPreview:
             buttongrid:buttongrid
-            id:buttongrid
-            rows:4
-            cols:3
+            id:camerapreview
             size: root.size
-                
 
-        MenuButtons:
-            size_hint_y: 0.2
-            id:menubuttons
-            Button:
-                text: "CAMERA\nON/OFF"
-                background_color: 1,1,1,0
-                color: 1,.3,.3,.5
-                font_size:35
-                bold:True
-                on_press:camerapreview.play()
-                                    
-            Button:
-                text: "NEXT\nPAGE"
-                background_color: 1,1,1,0
-                color: 1,.3,.3,.5
-                font_size:35
-                bold:True
-                on_press:buttongrid.refreshAndSwitchButtonSet(mode='next')
-                                    
-            Button:
-                text: "+NEW\nBUTTON"
-                background_color: 1,1,1,0
-                color: 1,.3,.3,.5
-                font_size:35
-                bold:True
-                on_press:camerapreview.add_newbutton_popup_open()
-                                    
-            Button:
-                text: "LORD\nJSON"
-                background_color: 1,1,1,0
-                color: 1,.3,.3,.5
-                font_size:35
-                bold:True
-                on_press:camerapreview.load_json_popup_open()
-                                    
-            Button:
-                text: "LORD\nTEST"
-                background_color: 1,1,1,0
-                color: 1,.3,.3,.5
-                font_size:35
-                bold:True
-                on_press:camerapreview.test()
-                                    
-            # Button:
-            #     text: "EXPORT\nJSON"
-            #     background_color: 1,1,1,0
-            #     color: 1,.3,.3,.5
-            #     font_size:35
-            #     bold:True
-            #     on_press:camerapreview.add_newbutton_popup_open()
-                                    
-            # Button:
-            #     text: "ABOUT"
-            #     background_color: 1,1,1,0
-            #     color: 1,.3,.3,.5
-            #     font_size:35
-            #     bold:True
-            #     on_press:camerapreview.add_newbutton_popup_open()
-                
-            # Button:
-            #     text: "Default"
-            #     background_color: 1,1,1,0
-            #     color: 1,.3,.3,.5
-            #     font_size:35
-            #     bold:True
-            # #     on_press:camerapreview.load_default_settings()
-            # Button:
-            #     text: "Max"
-            #     background_color: 1,1,1,0
-            #     color: 1,.3,.3,.5
-            #     font_size:35
-            #     bold:True
-            #     # on_press:camerapreview.add_button()
-            #     on_press:buttongrid.test_children()
+        BoxLayout:
+            orientation: 'vertical'
+            size: root.size
+            
+            ButtonGrid:
+                camera_preview:camerapreview
+                buttongrid:buttongrid
+                id:buttongrid
+                rows:4
+                cols:3
+                size: root.size
+                    
+
+            MenuButtons:
+                size_hint_y: 0.2
+                id:menubuttons
+                Button:
+                    text: "CAMERA\nON/OFF"
+                    background_color: 1,1,1,0
+                    color: 1,.3,.3,.5
+                    font_size:35
+                    bold:True
+                    on_press:camerapreview.play()
+                                        
+                Button:
+                    text: "NEXT\nPAGE"
+                    background_color: 1,1,1,0
+                    color: 1,.3,.3,.5
+                    font_size:35
+                    bold:True
+                    on_press:buttongrid.refreshAndSwitchButtonSet(mode='next')
+                                        
+                Button:
+                    text: "+NEW\nBUTTON"
+                    background_color: 1,1,1,0
+                    color: 1,.3,.3,.5
+                    font_size:35
+                    bold:True
+                    on_press:camerapreview.add_newbutton_popup_open()
+                                        
+                Button:
+                    text: "LORD\nJSON"
+                    background_color: 1,1,1,0
+                    color: 1,.3,.3,.5
+                    font_size:35
+                    bold:True
+                    on_press:camerapreview.load_json_popup_open()
+                                        
+                Button:
+                    text: "LORD\nTEST"
+                    background_color: 1,1,1,0
+                    color: 1,.3,.3,.5
+                    font_size:35
+                    bold:True
+                    on_press:camerapreview.test()
+                                        
+                # Button:
+                #     text: "EXPORT\nJSON"
+                #     background_color: 1,1,1,0
+                #     color: 1,.3,.3,.5
+                #     font_size:35
+                #     bold:True
+                #     on_press:camerapreview.add_newbutton_popup_open()
+                                        
+                # Button:
+                #     text: "ABOUT"
+                #     background_color: 1,1,1,0
+                #     color: 1,.3,.3,.5
+                #     font_size:35
+                #     bold:True
+                #     on_press:camerapreview.add_newbutton_popup_open()
+                    
+                # Button:
+                #     text: "Default"
+                #     background_color: 1,1,1,0
+                #     color: 1,.3,.3,.5
+                #     font_size:35
+                #     bold:True
+                # #     on_press:camerapreview.load_default_settings()
+                # Button:
+                #     text: "Max"
+                #     background_color: 1,1,1,0
+                #     color: 1,.3,.3,.5
+                #     font_size:35
+                #     bold:True
+                #     # on_press:camerapreview.add_button()
+                #     on_press:buttongrid.test_children()
+                    
+# <CameraWidget@Widget>:
 
 
 <ButtonAddFixMenu>

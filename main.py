@@ -44,7 +44,9 @@ if platform == "android":
 else:pass
 
 
-class AppFrame(BoxLayout):pass
+class AppFrame(BoxLayout):
+    buttongrid = ObjectProperty()
+
 class MenuButtons(BoxLayout):pass
 
 class ButtonGrid(GridLayout):
@@ -56,10 +58,12 @@ class ButtonGrid(GridLayout):
     
     
     def on_parent(self, instance, value):
+        print('on_parent呼び出し確認')
         self.refreshAndSwitchButtonSet()
 
     
     def refreshAndSwitchButtonSet(self, mode=None):
+        print('refreshAndSwitchButtonSet呼び出し回数確認')
         '''シャッターボタンを更新する。もしくは次のページ（次の12個のボタン）を表示する関数
         '''
         settings = config_manager.settings
@@ -177,7 +181,7 @@ class CameraPreview(Preview):
         num = new_button
         name = '新規ラベル'
         popup_text = [btn, num, name]
-        content = ButtonAddFixMenu(popup_text=popup_text, popup_close=self.popup_close, update_setting=self.add_newbutton)
+        content = ButtonAddFixMenu(popup_text=popup_text, popup_close=self.popup_close, update_setting=self.update_setting)
         self.popup = Popup(title=f'ボタン{new_button}を追加', content=content, size_hint=(0.5, 0.5), auto_dismiss=True)
         self.popup.open()
 
@@ -189,34 +193,33 @@ class CameraPreview(Preview):
         self.popup.open()
 
     def load_json_popup_open(self):
-        content = LoadJsonMenu(popup_close=self.popup_close, load=self.load_external_json)
-        self.popup = Popup(title=f'JSONファイル読込', content=content, size_hint=(0.5, 0.5), auto_dismiss=True)
-        self.popup.open()
+        # windowsの場合はkivyのfilechooserを使用する。
+        if platform == "win":
+            content = LoadJsonMenu(popup_close=self.popup_close, load=self.load_external_json)
+            self.popup = Popup(title=f'JSONファイル読込', content=content, size_hint=(0.5, 0.5), auto_dismiss=True)
+            self.popup.open()
+        # Androidであればandroidのファイルピッカーを使用する。
+        if platform == "android":
+            config_manager.load_json_with_android_filepicker()
 
     def popup_close(self):
         self.popup.dismiss()
     
     def update_setting(self, btn, num, name):
         config_manager.update_setting(btn, num, name)
-        self.buttongrid.refreshAndSwitchButtonSet()
+        # self.buttongrid.refreshAndSwitchButtonSet()
     
     def delete_setting(self, num):
         config_manager.delete_setting(num)
         print('動いてる？')
-        self.buttongrid.refreshAndSwitchButtonSet()
+        # self.buttongrid.refreshAndSwitchButtonSet()
     
     def load_external_json(self,path,selected):
         if selected:config_manager.load_config_from_file(selected[0])
-        self.buttongrid.refreshAndSwitchButtonSet()
+        # self.buttongrid.refreshAndSwitchButtonSet()
 
-    def add_newbutton(self, btn, num, name):
-        settings = config_manager.settings
-        settings[btn] = {
-            "num": num,
-            "name": name  # ここに適切な名前や値を設定してください
-        }
-        config_manager.save_config_to_file('config.json', settings)
-        self.buttongrid.refreshAndSwitchButtonSet()
+    # def add_newbutton(self, btn, num, name):
+    #     config_manager.update_setting(btn, num, name)
 
     
     def test(self):
@@ -361,7 +364,8 @@ class SnapCategorizerApp(App):
 
     def build(self):
         show_toast(self.title)
-        return AppFrame()
+        self.root = AppFrame()
+        return self.root
     
 
 if __name__ == '__main__':                      #main.pyが直接実行されたら、、、という意味らしい
