@@ -8,6 +8,10 @@ from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.audio import SoundLoader
+from kivy.core.text import Label as CoreLabel
+from kivy.graphics import Rectangle
+
+from kivy.graphics import Color, Line
 from kivy.properties import ObjectProperty, StringProperty, ListProperty
 from kivy.utils import platform
 from kivy.clock import Clock
@@ -76,9 +80,6 @@ class ButtonGrid(GridLayout):
         print(current_buttons)
 
 class CameraPreview(Preview):
-    # image_texture = ObjectProperty(None)
-    # image_capture = ObjectProperty(None)
-    # camera = ObjectProperty(None)
     camerapreview = ObjectProperty(None)
     buttongrid = ObjectProperty(None)
     sound = SoundLoader.load(r'./res/shuttersound.mp3')
@@ -169,18 +170,17 @@ class CameraPreview(Preview):
     def popup_close(self):
         self.popup.dismiss()
 
- 
-
-    
-
-
 class ATButton(Button):
     def __init__(self,
                  custom_id='btn0', 
                  text='ボタン', 
-                 font_size=35, 
+                 font_size= '35sp', 
+                 color= (1,1,1,1), 
+                 outline_color= (1,0,0,.5), 
+                 outline_weight= .8,
                  background_color= (1,1,1,0),
                  halign= 'center',
+                 pos_hint={"center_x": 0.5, "center_y": 0.5},
                  **kwargs):
         
         super(ATButton, self).__init__(**kwargs)
@@ -192,11 +192,12 @@ class ATButton(Button):
         self.background_color= background_color
         self.halign= halign
 
-        # 文字色変更用
-        self.color_index = 0
-        self.colors = [(0, 0, 0, .7), (1, 0, 0, .7), (1, 1, 1, .7), (1, 1, 1, 0)]  # 黒, 赤, 白
-        self.color = self.colors[self.color_index]
-        Clock.schedule_interval(self.update_color, 1/4)  # 1秒ご
+        # 白抜き文字の実装
+        self.color = color
+        self.outline_color = outline_color
+        self.outline_weight = outline_weight
+        self.pos_hint= pos_hint
+        self.bind(size=self.update_text, pos=self.update_text)
 
         # 長押しを実装
         self.start = 0
@@ -206,73 +207,41 @@ class ATButton(Button):
         self.register_event_type('on_double_press')
         self.register_event_type('on_long_press')
 
-    
-    def update_color(self, *args):
-        self.color_index = (self.color_index + 1) % 4
-        self.color = self.colors[self.color_index]
+    def update_text(self, *args):
+        # 以前のアウトラインの描画をクリアする
+        self.canvas.before.clear()
+        
+        # アウトラインの色を白に設定
+        outline_color = self.outline_color
+        outline_weight = self.outline_weight
 
-    # def on_touch_down(self, touch):
-    #     print('タッチダウン！')
-    #     if super(ATButton, self).on_touch_down(touch):
-    #         if self._current_touch_id is None or self._current_touch_id != touch.uid:
-    #             # 新たなタッチが発生した場合のみ、フラグをリセットし、タイマーを設定
-    #             self._is_long_press = False
-    #             self._long_press_clock = Clock.schedule_once(self._do_long_press, self.long_press_time)
-    #             self._current_touch_id = touch.uid  # タッチのIDを保存
-    #         return True
-    #     return False
-
-    #     # print('タッチダウン！')
-    #     # self._is_long_press = False  # タッチが始まるたびにフラグをリセット
-    #     # if super(ATButton, self).on_touch_down(touch):
-    #     #     self._long_press_clock = Clock.schedule_once(self._do_long_press, self.long_press_time)
-    #     #     return True
-    #     # return False
-
-    # def on_touch_up(self, touch):
-    #     print('タッチアップ！')
-    #     if self._long_press_clock:
-    #         Clock.unschedule(self._long_press_clock)
-    #         self._long_press_clock = None
-
-    #     if touch.grab_current is self and not self._is_long_press:
-    #         # 長押しでなければ、on_release イベントを発火
-    #         self.dispatch('on_release')
-
-    #     # タッチが終了したので、タッチのIDをリセット
-    #     if self._current_touch_id == touch.uid:
-    #         self._current_touch_id = None
-
-    # #     return super(ATButton, self).on_touch_up(touch)
-
-    # def _on_state(self, instance, value):
-    #     print(value)
-    #     if value == 'down':
-    #         # ボタンが押されたとき、長押しフラグをリセットし、タイマーを設定
-    #         self._is_long_press = False
-    #         self._long_press_clock = Clock.schedule_once(self._do_long_press, self._long_press_time)
-    #     else:
-    #         # ボタンが離されたとき、タイマーをキャンセル
-    #         if self._long_press_clock:
-    #             Clock.unschedule(self._long_press_clock)
-    #             self._long_press_clock = None
-
-    #         if not self._is_long_press:
-    #             # 長押しでなければ、on_release イベントを発火
-    #             self.dispatch('on_release')
-
-    #         # タッチが終了したので、長押しフラグをリセット
-    #         self._is_long_press = False
-
-    # def _do_long_press(self, dt):
-    #     self._is_long_press = True  # 長押しを検出
-    #     self.dispatch('on_long_press')
-
-    # def on_long_press(self):
-    #     print("Long press detected")
-
-    # def on_release(self):
-    #     print("Button released")
+        
+        # テキストの情報を持つCoreLabelオブジェクトを生成
+        text_label = CoreLabel(text=self.text, font_size=self.font_size, font_name=self.font_name, halign=self.halign)
+        
+        # CoreLabelオブジェクトを更新して、テキストのテクスチャを生成
+        text_label.refresh()
+        
+        # テキストのテクスチャを取得
+        texture = text_label.texture
+        
+        # テキストのテクスチャのサイズを取得
+        texture_size = texture.size
+        
+        # アウトラインを描画するためのコンテキストに入る
+        with self.canvas.before:
+            # アウトラインの色を設定
+            Color(*outline_color)
+            
+            # アウトラインを描画（縁取りの太さを調整するためのループ）
+            for x in [-outline_weight, 0, outline_weight]:
+                for y in [-outline_weight, 0, outline_weight]:
+                    if x != 0 or y != 0:
+                        # アウトラインの一部を描画
+                        Rectangle(texture=texture, 
+                                pos=(self.center_x + x - texture_size[0] / 2.0, 
+                                    self.center_y + y - texture_size[1] / 2.0),
+                                size=texture_size)
 
     def on_touch_down(self, touch):
         if self.collide_point(touch.x, touch.y):
