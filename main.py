@@ -37,9 +37,9 @@ if platform == "android":
     for p in permissions:
         granted = granted and check_permission(p)
     if not granted:
-        request_permissions([Permission.CAMERA],
-                            [Permission.WRITE_EXTERNAL_STORAGE],
-                            [Permission.READ_EXTERNAL_STORAGE]
+        request_permissions([Permission.CAMERA,
+                             Permission.WRITE_EXTERNAL_STORAGE,
+                             Permission.READ_EXTERNAL_STORAGE]
                             )
 else:pass
 
