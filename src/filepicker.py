@@ -30,7 +30,6 @@ class ActivityResultEvent(PythonJavaClass):
 
     @java_method('(IILandroid/content/Intent;)V')
     def onActivityResult(self, requestCode, resultCode, intent):
-        show_toast('確認')
         if requestCode == PICK_JSON_FILE:
             if resultCode == RESULT_OK:
                 uri = intent.getData()
@@ -44,6 +43,7 @@ def open_file(picker_initial_uri):
     intent.setType("application/json")
     current_activity = PythonActivity.mActivity
     current_activity.startActivityForResult(intent, PICK_JSON_FILE)
+    show_toast('確認')
 
 def read_json_file(uri):
     content_resolver = PythonActivity.mActivity.getContentResolver()
@@ -78,14 +78,15 @@ def process_json_data(data):
 #     try:
 #         process_json_data(json_data)
 #     except json.JSONDecodeError as e:
-#         print("Failed to decode JSON:", e)
+#         print("Failed to decode JSON:", e)   
 
-def load_json_4android():    
-    def callback_function(json_data):
-        try:
-            process_json_data(json_data)
-        except json.JSONDecodeError as e:
-            print("Failed to decode JSON:", e)
+def callback_function(json_data):
+    try:
+        process_json_data(json_data)
+    except json.JSONDecodeError as e:
+        print("Failed to decode JSON:", e)
+
+def load_json_4android():
     
     event = ActivityResultEvent(callback_function)
     
