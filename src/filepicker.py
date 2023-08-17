@@ -2,6 +2,7 @@ from jnius import autoclass, PythonJavaClass, java_method
 import json
 
 from . import config_manager
+from .func import show_toast
 
 try:from android.config import ACTIVITY_CLASS_NAME, ACTIVITY_CLASS_NAMESPACE
 except:pass
