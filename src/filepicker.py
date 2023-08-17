@@ -16,7 +16,7 @@ PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 class ActivityResultEvent(PythonJavaClass):
     __javainterfaces__ = [ACTIVITY_CLASS_NAMESPACE + '$ActivityResultListener']
-    __javacontext__ = 'app'
+    # __javacontext__ = 'app'
 
     def __init__(self, callback):
         super(ActivityResultEvent, self).__init__()
@@ -32,13 +32,13 @@ class ActivityResultEvent(PythonJavaClass):
                 json_data = json.loads(json_text)
                 self.callback(json_data)
 
-def open_file(picker_initial_uri):
-    show_toast('open_fileが呼び出されたか確認')
-    intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-    intent.addCategory(Intent.CATEGORY_OPENABLE)
-    intent.setType("application/json")
-    current_activity = PythonActivity.mActivity
-    current_activity.startActivityForResult(intent, PICK_JSON_FILE)
+# def open_file(picker_initial_uri):
+#     show_toast('open_fileが呼び出されたか確認')
+#     intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+#     intent.addCategory(Intent.CATEGORY_OPENABLE)
+#     intent.setType("application/json")
+#     current_activity = PythonActivity.mActivity
+#     current_activity.startActivityForResult(intent, PICK_JSON_FILE)
 
 def read_json_file(uri):
     show_toast('read_json_fileが呼び出されたか確認')
@@ -68,7 +68,12 @@ def load_json_4android():
     show_toast('load_json_4androidが呼び出されたか確認')
     event = ActivityResultEvent(callback_function)
     picker_initial_uri = Uri.parse("file:///sdcard/")
-    open_file(picker_initial_uri)
-
-# # KivyのPythonActivityにActivityResultListenerを追加します。
-PythonActivity.mActivity.addActivityResultListener(process_json_data)
+    # open_file(picker_initial_uri)
+    show_toast('open_fileが呼び出されたか確認')
+    intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+    intent.addCategory(Intent.CATEGORY_OPENABLE)
+    intent.setType("application/json")
+    intent.putExtra(Intent.EXTRA_INITIAL_URI, picker_initial_uri)
+    current_activity = PythonActivity.mActivity
+    current_activity.addActivityResultListener(event)
+    current_activity.startActivityForResult(intent, PICK_JSON_FILE)
