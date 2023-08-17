@@ -3,6 +3,9 @@ import json
 
 from . import config_manager
 
+try:from android.config import ACTIVITY_CLASS_NAME, ACTIVITY_CLASS_NAMESPACE
+except:pass
+
 # Request code for selecting a JSON document.
 PICK_JSON_FILE = 42
 RESULT_OK = -1  # Define a constant for RESULT_OK
@@ -11,7 +14,8 @@ RESULT_OK = -1  # Define a constant for RESULT_OK
 try:
     Uri = autoclass('android.net.Uri')
     Intent = autoclass('android.content.Intent')
-    PythonActivity = autoclass('org.kivy.android.PythonActivity')
+    PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
+    _activity = autoclass(ACTIVITY_CLASS_NAME).mActivity
 except Exception as e:
     print("Failed to import Java classes:", e)
 

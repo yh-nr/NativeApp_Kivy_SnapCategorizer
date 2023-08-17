@@ -1,7 +1,7 @@
 from jnius import autoclass, PythonJavaClass, java_method
 import json
-
 from . import config_manager
+
 
 # Request code for selecting a JSON document.
 PICK_JSON_FILE = 42  # JSONファイルを選択するためのリクエストコードを定義します。
@@ -16,8 +16,10 @@ except:
     print('autoclassでエラーでたよ！！！！！！')
     print('autoclassでエラーでたよ！！！！！！')
 
+
+
 class ActivityResultEvent(PythonJavaClass):
-    __javainterfaces__ = ['org/kivy/android/ActivityResultListener']
+    __javainterfaces__ = [ACTIVITY_CLASS_NAMESPACE + '$ActivityResultListener']
     __javacontext__ = 'app'
 
     def __init__(self, callback):
@@ -108,4 +110,4 @@ def process_json_data(data):
 
     
 # # KivyのPythonActivityにActivityResultListenerを追加します。
-# PythonActivity.addActivityResultListener(process_json_data())
+PythonActivity.mActivity.addActivityResultListener(process_json_data())
