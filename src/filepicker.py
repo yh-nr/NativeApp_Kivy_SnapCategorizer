@@ -30,6 +30,7 @@ class ActivityResultEvent(PythonJavaClass):
 
     @java_method('(IILandroid/content/Intent;)V')
     def onActivityResult(self, requestCode, resultCode, intent):
+        show_toast('確認cb')
         if requestCode == PICK_JSON_FILE:
             if resultCode == RESULT_OK:
                 uri = intent.getData()
