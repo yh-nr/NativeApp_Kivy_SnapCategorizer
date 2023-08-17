@@ -111,5 +111,3 @@ def process_json_data(data):
     print(data)  # ここではJSONデータを単に出力していますが、実際にはこのデータを使用して何らかの処理を行います。
 
     
-# # KivyのPythonActivityにActivityResultListenerを追加します。
-PythonActivity.mActivity.addActivityResultListener(process_json_data())

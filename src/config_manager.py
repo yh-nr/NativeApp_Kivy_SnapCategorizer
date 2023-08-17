@@ -1,6 +1,9 @@
 import json
 from kivy.app import App
-from .filepicker import load_json_4android
+from kivy.utils import platform
+
+if platform == 'android':
+    from .filepicker import load_json_4android
 
 
 SETTINGS_FILE = r'config.json'
