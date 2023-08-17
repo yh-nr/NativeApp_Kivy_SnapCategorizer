@@ -71,5 +71,4 @@ def load_json_4android():
     open_file(picker_initial_uri)
 
 # # KivyのPythonActivityにActivityResultListenerを追加します。
-PythonActivity.mActivity.addActivityResultListener(process_json_data())
-PythonActivity.addActivityResultListener(process_json_data())
+PythonActivity.mActivity.addActivityResultListener(process_json_data)
