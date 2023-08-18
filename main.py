@@ -70,6 +70,9 @@ class ButtonGrid(GridLayout):
         '''
         settings = config_manager.settings
         limit = max([int(key.replace("btn", "")) for key in settings if key.startswith("btn")])
+        print("ボタン更新前確認")
+        print(limit)
+        print(settings)
         offset=0
         current_buttons = [int(bc.custom_id.replace('btn','')) for bc in self.children]
         if len(current_buttons):offset += max(current_buttons)+1
