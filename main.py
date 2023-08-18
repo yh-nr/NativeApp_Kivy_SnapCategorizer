@@ -160,6 +160,7 @@ class CameraPreview(Preview):
             subdir = os.path.join(subdir1, subdir2)
             self.capture_photo(subdir=subdir ,name=name)
         print(subdir)
+        print(config_manager.SETTINGS_FILE)
         
         pass
 
@@ -209,16 +210,12 @@ class CameraPreview(Preview):
     
     def update_setting(self, btn, num, name):
         config_manager.update_setting(btn, num, name)
-        # self.buttongrid.refreshAndSwitchButtonSet()
     
     def delete_setting(self, num):
         config_manager.delete_setting(num)
-        print('動いてる？')
-        # self.buttongrid.refreshAndSwitchButtonSet()
     
     def load_external_json(self,path,selected):
         if selected:config_manager.load_config_from_file(selected[0])
-        # self.buttongrid.refreshAndSwitchButtonSet()
 
     # def add_newbutton(self, btn, num, name):
     #     config_manager.update_setting(btn, num, name)
