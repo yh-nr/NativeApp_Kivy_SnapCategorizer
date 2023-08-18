@@ -16,7 +16,7 @@ PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 class ActivityResultEvent(PythonJavaClass):
     __javainterfaces__ = [ACTIVITY_CLASS_NAMESPACE + '$ActivityResultListener']
-    # __javacontext__ = 'app'
+    __javacontext__ = 'app'
 
     def __init__(self, callback):
         super(ActivityResultEvent, self).__init__()
