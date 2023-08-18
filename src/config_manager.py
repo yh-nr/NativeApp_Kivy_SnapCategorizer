@@ -1,3 +1,4 @@
+import os
 import json
 from kivy.app import App
 from kivy.utils import platform
@@ -11,13 +12,18 @@ DEFAULT_SETTINGS_FILE = r'./assets/config.json'
 
 def load_config_from_file(filename=SETTINGS_FILE):
     global settings
+    print("pathの確認(load_config)")
+    print(os.path.abspath(filename))
     with open(filename, 'r', encoding='utf-8') as f:
         settings = json.load(f)
-        save_config_to_file(SETTINGS_FILE, settings)
+        print('save_configに渡す前')
         print(settings)
+        save_config_to_file(SETTINGS_FILE, settings)
     return settings
 
 def save_config_to_file(filename, data):
+    print("pathの確認(save_config)")
+    print(os.path.abspath(filename))
     print('save時の確認！')
     print(filename)
     print(data)
