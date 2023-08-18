@@ -73,7 +73,7 @@ def load_json_4android():
     intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
     intent.addCategory(Intent.CATEGORY_OPENABLE)
     intent.setType("application/json")
-    intent.putExtra(Intent.EXTRA_INITIAL_URI, picker_initial_uri)
+    # intent.putExtra(Intent.EXTRA_INITIAL_URI, picker_initial_uri)
     current_activity = PythonActivity.mActivity
     current_activity.addActivityResultListener(event)
     current_activity.startActivityForResult(intent, PICK_JSON_FILE)
