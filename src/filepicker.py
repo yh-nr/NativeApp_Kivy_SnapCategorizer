@@ -66,6 +66,7 @@ def process_json_data_callback(requestCode, resultCode, intent):
             json_text = read_json_file(uri)
             json_data = json.loads(json_text)
             config_manager.save_config_to_file(config_manager.SETTINGS_FILE, json_data)
+            print(json_data)
     
 
 def load_json_4android():

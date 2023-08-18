@@ -14,6 +14,7 @@ def load_config_from_file(filename=SETTINGS_FILE):
     with open(filename, 'r', encoding='utf-8') as f:
         settings = json.load(f)
         save_config_to_file(SETTINGS_FILE, settings)
+        print(settings)
     return settings
 
 def save_config_to_file(filename, data):
