@@ -6,11 +6,10 @@ from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.filechooser import FileChooserListView
+# from kivy.uix.filechooser import FileChooserListView
 from kivy.core.audio import SoundLoader
 from kivy.core.text import Label as CoreLabel
 from kivy.graphics import Rectangle
-
 from kivy.graphics import Color, Line
 from kivy.properties import ObjectProperty, StringProperty, ListProperty, NumericProperty
 from kivy.utils import platform
@@ -19,19 +18,23 @@ from kivy.config import Config
 Config.set('kivy', 'log_level', 'debug')
 import japanize_kivy
 from camera4kivy import Preview
-try:
-    from android.permissions import request_permissions, Permission, check_permission
-    from src.filepicker import open_file
-except:pass
 
 from src.func import show_toast
 from src import config_manager
+
 
 DOUBLE_TAP_TIME = 0.2   # Change time in seconds
 LONG_PRESSED_TIME = 0.3  # Change time in seconds
 
 # カメラへのアクセス許可を要求する
-if platform == "android":
+
+# Androidの場合のみのimportとpermission要求
+if platform == 'android':
+    from src.filepicker import lprocess_json_data_callback
+    from android.permissions import request_permissions, Permission, check_permission
+    
+    from android import activity
+
     granted = True
     permissions = [Permission.CAMERA, Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE]
     for p in permissions:
@@ -41,7 +44,6 @@ if platform == "android":
                              Permission.WRITE_EXTERNAL_STORAGE,
                              Permission.READ_EXTERNAL_STORAGE]
                             )
-else:pass
 
 
 class AppFrame(BoxLayout):
@@ -221,10 +223,7 @@ class CameraPreview(Preview):
     # def add_newbutton(self, btn, num, name):
     #     config_manager.update_setting(btn, num, name)
 
-    
-    def test(self):
-        print('チェックチェック')
-        open_file("content://downloads/public_downloads")
+
 
 class ATButton(Button):
     def __init__(self,
@@ -357,16 +356,30 @@ class LoadJsonMenu(BoxLayout):
     load = ObjectProperty(None)
     popup_close = ObjectProperty(None)
 
+
+
 class SnapCategorizerApp(App):
     def __init__(self, **kwargs):
         super(SnapCategorizerApp, self).__init__(**kwargs)
         self.title = 'SnapCategorizer for ML Image Annotation'
 
-    def build(self):
-        show_toast(self.title)
-        self.root = AppFrame()
-        return self.root
+    if platform == 'android':
+        def on_activity_result(self, requestCode, resultCode, intent):
+            show_toast('on_activity_resultの実行を確認したよ！')
+            process_json_data_callback(requestCode, resultCode, intent)
+
+        def build(self):
+            show_toast(f'{self.title} android ver')  #アプリ起動時にアプリ名をトースト
+            activity.bind(on_activity_result=self.on_activity_result)   # on_activity_resultをバインド
+            self.root = AppFrame()
+            return self.root
+    else:
+        def build(self):
+            show_toast(f'{self.title} win ver')  #アプリ起動時にアプリ名をトースト
+            self.root = AppFrame()
+            return self.root
+    
     
 
 if __name__ == '__main__':                      #main.pyが直接実行されたら、、、という意味らしい
-    SnapCategorizerApp().run()                         #
+    SnapCategorizerApp().run()                  #
