@@ -30,7 +30,7 @@ LONG_PRESSED_TIME = 0.3  # Change time in seconds
 
 # Androidの場合のみのimportとpermission要求
 if platform == 'android':
-    from src.filepicker import lprocess_json_data_callback
+    from src.filepicker import process_json_data_callback
     from android.permissions import request_permissions, Permission, check_permission
     
     from android import activity
