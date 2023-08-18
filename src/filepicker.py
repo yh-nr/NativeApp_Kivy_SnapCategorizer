@@ -43,6 +43,7 @@ PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 def read_json_file(uri):
     show_toast('read_json_fileが呼び出されたか確認')
+    print(uri)
     content_resolver = PythonActivity.mActivity.getContentResolver()
     stream = content_resolver.openInputStream(uri)  
     json_text = ''
